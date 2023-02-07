@@ -1,3 +1,13 @@
+// Package waveshare7in5v2 implements a driver for the waveshare 7in5 V2 e-Paper display
+// to be used on a Raspberry Pi board.
+//
+// A simple driver Epd is implemented that closely follows the official C/Python examples
+// provided by waveshare. There is also a Canvas that implements draw.Image allowing to use
+// any compatible package to draw to the display.
+//
+// Datasheet:   https://www.waveshare.com/w/upload/6/60/7.5inch_e-Paper_V2_Specification.pdf
+// C code:      https://github.com/waveshare/e-Paper/blob/master/RaspberryPi_JetsonNano/c/lib/e-Paper/EPD_7in5_V2.c
+// Python code: https://github.com/waveshare/e-Paper/blob/master/RaspberryPi_JetsonNano/python/lib/waveshare_epd/epd7in5_V2.py
 package waveshare7in5v2
 
 import (
@@ -7,6 +17,7 @@ import (
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
+// The driver to interact with the e-paper display
 type Epd struct {
 	dc   rpio.Pin
 	cs   rpio.Pin
@@ -57,16 +68,22 @@ func New() (*Epd, error) {
 	return d, nil
 }
 
+// Powers on the screen after power off or sleep.
 func (e *Epd) Init() {
 	e.reset()
 
 	e.initDisplay()
 }
 
+// Returns the current screen bounds
 func (e *Epd) Bounds() image.Rectangle {
 	return e.bounds
 }
 
+// Converts an image into a buffer array ready to be sent to the display.
+// Due to the display only supporting 2 colors, Black and White, the white color
+// (r = 0, g = 0, b = 0) is preserved. Everything else is converted to black.
+// The returned buffer is ready to be sent using UpdateFrame.
 func (e *Epd) GetBuffer(img image.Image) []byte {
 	buffer := make([]byte, e.bufferSize)
 
@@ -89,6 +106,7 @@ func (e *Epd) GetBuffer(img image.Image) []byte {
 	return buffer
 }
 
+// Updates the internal display buffer.
 func (e *Epd) UpdateFrame(buffer []byte) {
 	log.Println("Updating frame")
 
@@ -98,6 +116,7 @@ func (e *Epd) UpdateFrame(buffer []byte) {
 	log.Println("Updating frame. Done")
 }
 
+// Refreshes the display by sending the internal buffer to the screen.
 func (e *Epd) Refresh() {
 	log.Println("Refreshing display")
 
@@ -108,17 +127,20 @@ func (e *Epd) Refresh() {
 	log.Println("Refreshing display. Done")
 }
 
+// Updates the internal display buffer and refresh the screen in sequence.
 func (e *Epd) UpdateFrameAndRefresh(buffer []byte) {
 	e.UpdateFrame(buffer)
 	e.Refresh()
 }
 
+// Allows to easily send an image.Image directly to the screen.
 func (e *Epd) DisplayImage(img image.Image) {
 	buffer := e.GetBuffer(img)
 
 	e.UpdateFrameAndRefresh(buffer)
 }
 
+// Clear the buffer and updates the screen right away.
 func (e *Epd) Clear() {
 	log.Println("Clearing display")
 
@@ -132,6 +154,9 @@ func (e *Epd) Clear() {
 	log.Println("Clearing display. Done")
 }
 
+// Puts the display to sleep and powers off. This helps ensure the display longevity
+// since keeping it powered on for long periods of time can damage the screen.
+// After Sleep the display needs to be woken up by running Init again
 func (e *Epd) Sleep() {
 	log.Println("Putting display to sleep")
 	e.sendCommand(POWER_OFF)
@@ -144,6 +169,7 @@ func (e *Epd) Sleep() {
 	log.Println("Putting display to sleep. Done")
 }
 
+// Powers off the display and closes the SPI connection.
 func (e *Epd) Close() {
 	e.cs.Write(rpio.Low)
 	e.dc.Write(rpio.Low)

@@ -5,6 +5,8 @@ import (
 	"image/color"
 )
 
+// The Canvas implements draw.Image and thus allows to use any compatible
+// package to draw on the screen.
 type Canvas struct {
 	e *Epd
 
@@ -39,20 +41,14 @@ func (c *Canvas) Set(x, y int, color color.Color) {
 	c.img.Set(x, y, color)
 }
 
+// Flushes any changes done locally and updates the display
 func (c *Canvas) Refresh() {
 	buffer := c.e.GetBuffer(c.img)
 
 	c.e.UpdateFrameAndRefresh(buffer)
 }
 
-func (c *Canvas) Init() {
-	c.e.Init()
-}
-
+// Clear the buffer and updates the screen right away.
 func (c *Canvas) Clear() {
 	c.e.Clear()
-}
-
-func (c *Canvas) Sleep() {
-	c.e.Sleep()
 }
