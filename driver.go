@@ -89,12 +89,12 @@ func (e *Epd) GetBuffer(img image.Image) []byte {
 
 	for y := 0; y < e.bounds.Dy(); y++ {
 		for x := 0; x < e.bounds.Dx(); x += PIXEL_SIZE {
-			// Start with back
+			// Start with white
 			var pixel byte = 0x00
 
 			// Iterate and append over the next 8 pixels
 			for px := 0; px < PIXEL_SIZE; px++ {
-				if isWhite(img.At(x+px, y)) {
+				if isBlack(img.At(x+px, y)) {
 					pixel |= (0x80 >> px)
 				}
 			}
