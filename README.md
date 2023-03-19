@@ -25,7 +25,7 @@ epd.Init()
 
 // Create an image with the same size has the screen
 pattern := image.NewRGBA(epd.Bounds())
-draw.Draw(pattern, pattern.Bounds(), image.White, image.ZP, draw.Src)
+draw.Draw(pattern, pattern.Bounds(), image.White, image.Point{}, draw.Src)
 drawer := &font.Drawer{
   Dst:  pattern,
   Src:  image.Black,
@@ -66,7 +66,7 @@ canvas := waveshare7in5v2.NewCanvas(epd);
 
 // Draw directly into the canvas. This will store any changes into a buffer
 // until the display is refreshed
-draw.Draw(canvas, canvas.Bounds(), image.White, image.ZP, draw.Src)
+draw.Draw(canvas, canvas.Bounds(), image.White, image.Point{}, draw.Src)
 drawer := &font.Drawer{
   Dst:  canvas,
   Src:  image.Black,
