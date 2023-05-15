@@ -43,9 +43,7 @@ func (c *Canvas) Set(x, y int, color color.Color) {
 
 // Flushes any changes done locally and updates the display
 func (c *Canvas) Refresh() {
-	buffer := c.e.GetBuffer(c.img)
-
-	c.e.UpdateFrameAndRefresh(buffer)
+	c.e.DisplayImage(c.img)
 }
 
 // Clear the buffer and updates the screen right away.
