@@ -5,10 +5,8 @@ import (
 	"time"
 )
 
-func isBlack(c color.Color) bool {
-	r, g, b, _ := c.RGBA()
-
-	return r == 0 && g == 0 && b == 0
+func isBlack(c color.Color, threshold uint8) bool {
+	return color.GrayModel.Convert(c).(color.Gray).Y < threshold
 }
 
 func splitInChunks(data []byte) [][]byte {

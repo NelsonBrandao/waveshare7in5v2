@@ -81,10 +81,9 @@ func (e *Epd) Bounds() image.Rectangle {
 }
 
 // Converts an image into a buffer array ready to be sent to the display.
-// Due to the display only supporting 2 colors, Black and White, the white color
-// (r = 0, g = 0, b = 0) is preserved. Everything else is converted to black.
+// Due to the display only supporting 2 colors a threshold is applied to convert the image to pure black and white.
 // The returned buffer is ready to be sent using UpdateFrame.
-func (e *Epd) GetBuffer(img image.Image) []byte {
+func (e *Epd) GetBuffer(img image.Image, threshold uint8) []byte {
 	buffer := make([]byte, e.bufferSize)
 
 	for y := 0; y < e.bounds.Dy(); y++ {
@@ -94,7 +93,7 @@ func (e *Epd) GetBuffer(img image.Image) []byte {
 
 			// Iterate and append over the next 8 pixels
 			for px := 0; px < PIXEL_SIZE; px++ {
-				if isBlack(img.At(x+px, y)) {
+				if isBlack(img.At(x+px, y), threshold) {
 					pixel |= (0x80 >> px)
 				}
 			}
@@ -135,7 +134,7 @@ func (e *Epd) UpdateFrameAndRefresh(buffer []byte) {
 
 // Allows to easily send an image.Image directly to the screen.
 func (e *Epd) DisplayImage(img image.Image) {
-	buffer := e.GetBuffer(img)
+	buffer := e.GetBuffer(img, 199)
 
 	e.UpdateFrameAndRefresh(buffer)
 }
