@@ -31,6 +31,8 @@ type Epd struct {
 	fasterNormalRefresh bool
 }
 
+// New creates a new instance of the Epd struct.
+// Set fasterNormalRefresh to true to allow a slightly faster refresh.
 func New(fasterNormalRefresh bool) (*Epd, error) {
 	if err := rpio.Open(); err != nil {
 		return nil, err
@@ -136,6 +138,8 @@ func (e *Epd) Refresh() {
 	log.Println("Refreshing display. Done")
 }
 
+// RefreshQuick refreshes the display quick by sending the internal buffer to the screen.
+// Use a normal refresh regularly to clean the screen and prevent permanent damage!
 func (e *Epd) RefreshQuick() {
 	log.Println("Refreshing display quick")
 
@@ -150,6 +154,7 @@ func (e *Epd) RefreshQuick() {
 	log.Println("Refreshing display quick. Done")
 }
 
+// setLut sets the look up table for a faster normal refresh
 func (e *Epd) setLut() {
 	e.sendCommandWithData(0x20, getLutVcom())
 	e.sendCommandWithData(0x21, getLutWw())
@@ -158,6 +163,7 @@ func (e *Epd) setLut() {
 	e.sendCommandWithData(0x24, getLutBb())
 }
 
+// setLutQuick sets the look up table for a quick refresh
 func (e *Epd) setLutQuick() {
 	e.sendCommandWithData(0x20, getLutVcomFast())
 	e.sendCommandWithData(0x21, getLutWwFast())
@@ -184,6 +190,8 @@ func (e *Epd) DisplayImage(img image.Image) {
 	e.UpdateFrameAndRefresh(buffer)
 }
 
+// DisplayImageQuick allows to easily send an image.Image directly to the screen.
+// This uses the quick update. Use DisplayImage regularly to clean the screen and prevent permanent damage!
 func (e *Epd) DisplayImageQuick(img image.Image) {
 	buffer := e.GetBuffer(img, 199)
 
