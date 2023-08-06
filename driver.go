@@ -146,6 +146,8 @@ func (e *Epd) RefreshQuick() {
 	e.sendCommand(DISPLAY_REFRESH)
 	wait(100)
 	e.waitUntilIdle()
+
+	log.Println("Refreshing display quick. Done")
 }
 
 func (e *Epd) setLut() {
