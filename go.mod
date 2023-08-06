@@ -1,4 +1,4 @@
-module github.com/NelsonBrandao/waveshare7in5v2
+module github.com/afkjanus/waveshare7in5v2
 
 go 1.19
 
