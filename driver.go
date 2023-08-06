@@ -119,7 +119,8 @@ func (e *Epd) UpdateFrame(buffer []byte) {
 func (e *Epd) Refresh() {
 	log.Println("Refreshing display")
 
-	e.setLut()
+	e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
+	//e.setLut()
 	e.sendCommand(DISPLAY_REFRESH)
 	wait(100)
 	e.waitUntilIdle()
@@ -130,6 +131,7 @@ func (e *Epd) Refresh() {
 func (e *Epd) RefreshQuick() {
 	log.Println("Refreshing display quick")
 
+	e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
 	e.setLutQuick()
 	e.sendCommand(DISPLAY_REFRESH)
 	wait(100)
@@ -241,8 +243,8 @@ func (e *Epd) initDisplay() {
 	wait(100)
 	e.waitUntilIdle()
 
-	//e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
-	e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
+	e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
+	//e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
 
 	e.sendCommandWithData(RESOLUTION_SETTING, []byte{0x03, 0x20, 0x01, 0xe0})
 
