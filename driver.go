@@ -27,9 +27,11 @@ type Epd struct {
 	bounds     image.Rectangle
 	bufferSize int
 	pixelWidth int
+
+	fasterNormalRefresh bool
 }
 
-func New() (*Epd, error) {
+func New(fasterNormalRefresh bool) (*Epd, error) {
 	if err := rpio.Open(); err != nil {
 		return nil, err
 	}
@@ -63,6 +65,8 @@ func New() (*Epd, error) {
 		bounds:     bounds,
 		bufferSize: bufferSize,
 		pixelWidth: pixelWidth,
+
+		fasterNormalRefresh: fasterNormalRefresh,
 	}
 
 	return d, nil
@@ -119,8 +123,12 @@ func (e *Epd) UpdateFrame(buffer []byte) {
 func (e *Epd) Refresh() {
 	log.Println("Refreshing display")
 
-	e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
-	//e.setLut()
+	if e.fasterNormalRefresh {
+		e.setLut()
+	} else {
+		e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
+	}
+
 	e.sendCommand(DISPLAY_REFRESH)
 	wait(100)
 	e.waitUntilIdle()
@@ -131,7 +139,9 @@ func (e *Epd) Refresh() {
 func (e *Epd) RefreshQuick() {
 	log.Println("Refreshing display quick")
 
-	e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
+	if e.fasterNormalRefresh {
+		e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
+	}
 	e.setLutQuick()
 	e.sendCommand(DISPLAY_REFRESH)
 	wait(100)
@@ -243,8 +253,11 @@ func (e *Epd) initDisplay() {
 	wait(100)
 	e.waitUntilIdle()
 
-	e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
-	//e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
+	if e.fasterNormalRefresh {
+		e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
+	} else {
+		e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
+	}
 
 	e.sendCommandWithData(RESOLUTION_SETTING, []byte{0x03, 0x20, 0x01, 0xe0})
 
