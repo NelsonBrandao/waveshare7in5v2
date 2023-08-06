@@ -119,11 +119,37 @@ func (e *Epd) UpdateFrame(buffer []byte) {
 func (e *Epd) Refresh() {
 	log.Println("Refreshing display")
 
+	e.setLut()
 	e.sendCommand(DISPLAY_REFRESH)
 	wait(100)
 	e.waitUntilIdle()
 
 	log.Println("Refreshing display. Done")
+}
+
+func (e *Epd) RefreshQuick() {
+	log.Println("Refreshing display quick")
+
+	e.setLutQuick()
+	e.sendCommand(DISPLAY_REFRESH)
+	wait(100)
+	e.waitUntilIdle()
+}
+
+func (e *Epd) setLut() {
+	e.sendCommandWithData(0x20, getLutVcom())
+	e.sendCommandWithData(0x21, getLutWw())
+	e.sendCommandWithData(0x22, getLutBw())
+	e.sendCommandWithData(0x23, getLutWb())
+	e.sendCommandWithData(0x24, getLutBb())
+}
+
+func (e *Epd) setLutQuick() {
+	e.sendCommandWithData(0x20, getLutVcomFast())
+	e.sendCommandWithData(0x21, getLutWwFast())
+	e.sendCommandWithData(0x22, getLutBwFast())
+	e.sendCommandWithData(0x23, getLutWbFast())
+	e.sendCommandWithData(0x24, getLutBbFast())
 }
 
 // Updates the internal display buffer and refresh the screen in sequence.
@@ -132,11 +158,22 @@ func (e *Epd) UpdateFrameAndRefresh(buffer []byte) {
 	e.Refresh()
 }
 
+func (e *Epd) UpdateFrameAndRefreshQuick(buffer []byte) {
+	e.UpdateFrame(buffer)
+	e.RefreshQuick()
+}
+
 // Allows to easily send an image.Image directly to the screen.
 func (e *Epd) DisplayImage(img image.Image) {
 	buffer := e.GetBuffer(img, 199)
 
 	e.UpdateFrameAndRefresh(buffer)
+}
+
+func (e *Epd) DisplayImageQuick(img image.Image) {
+	buffer := e.GetBuffer(img, 199)
+
+	e.UpdateFrameAndRefreshQuick(buffer)
 }
 
 // Clear the buffer and updates the screen right away.
@@ -198,13 +235,14 @@ func (e *Epd) initDisplay() {
 	})
 
 	// Source code
-	// e.sendCommandWithData(VCOM_DC, []byte{0x24})
+	//e.sendCommandWithData(VCOM_DC, []byte{0x24})
 
 	e.sendCommand(POWER_ON)
 	wait(100)
 	e.waitUntilIdle()
 
-	e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
+	//e.sendCommandWithData(PANEL_SETTING, []byte{0x1f})
+	e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
 
 	e.sendCommandWithData(RESOLUTION_SETTING, []byte{0x03, 0x20, 0x01, 0xe0})
 
