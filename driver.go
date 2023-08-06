@@ -139,7 +139,7 @@ func (e *Epd) Refresh() {
 func (e *Epd) RefreshQuick() {
 	log.Println("Refreshing display quick")
 
-	if e.fasterNormalRefresh {
+	if !e.fasterNormalRefresh {
 		e.sendCommandWithData(PANEL_SETTING, []byte{0x3f}) // use custom LUT
 	}
 	e.setLutQuick()
