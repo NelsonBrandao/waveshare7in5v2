@@ -1,7 +1,7 @@
 # Waveshare 7in5 v2 Driver
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/afkjanus/waveshare7in5v2.svg)](https://pkg.go.dev/github.com/afkjanus/waveshare7in5v2)
-[![Go Report Card](https://goreportcard.com/badge/github.com/afkjanus/waveshare7in5v2)](https://goreportcard.com/report/github.com/afkjanus/waveshare7in5v2)
+[![Go Reference](https://pkg.go.dev/badge/github.com/NelsonBrandao/waveshare7in5v2.svg)](https://pkg.go.dev/github.com/NelsonBrandao/waveshare7in5v2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/NelsonBrandao/waveshare7in5v2)](https://goreportcard.com/report/github.com/NelsonBrandao/waveshare7in5v2)
 
 A driver written in Go for Waveshare 7in5 v2 e-Paper display to be used on a Raspberry Pi board.
 
